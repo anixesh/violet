@@ -27,7 +27,6 @@ if RunService:IsStudio() then
 	IsStudio = true
 end
 
--- ─── Tween helper ────────────────────────────────────────────────────────────
 local tween = {}
 setmetatable(tween, {
 	__call = function(self, object: Instance, goal, tweenin, callback)
