@@ -287,13 +287,16 @@ function Violet:CreateWindow(WindowSettings)
 
 	local Tabs = {}
 
-	function Tabs:NewTab(TabSettings)
+	function Tabs:NewTab(TabName)
+        assert(typeof(TabName) ~= "string", "[Violet]: Tab name must be a string.")
+        TabName = TabName or "Tab-"..#SidePanel.Tabs:GetChildren() - 2
+
 		local Tab = SidePanel.Tabs.Template:Clone()
-		Tab.Name = TabSettings.Title or "Tab-" .. #SidePanel.Tabs:GetChildren() - 2
-		Tab.Label.Text = TabSettings.Title
+		Tab.Name = TabName
+		Tab.Label.Text = TabName
 
 		local Page = Elements.Template:Clone()
-		Page.Name = TabSettings.Title
+		Page.Name = TabName
 		Page.Visible = false
 		Page.Position = UDim2.fromScale(0.5, 1.5)
 		Page.Parent = Elements
