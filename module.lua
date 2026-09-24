@@ -288,7 +288,6 @@ function Violet:CreateWindow(WindowSettings)
 	local Tabs = {}
 
 	function Tabs:NewTab(TabName)
-        assert(typeof(TabName) ~= "string", "[Violet]: Tab name must be a string.")
         TabName = TabName or "Tab-"..#SidePanel.Tabs:GetChildren() - 2
 
 		local Tab = SidePanel.Tabs.Template:Clone()
