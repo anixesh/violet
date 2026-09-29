@@ -77,7 +77,7 @@ end
 
 local VioletUI = (IsStudio and script.Parent.Parent:WaitForChild("Violet"))
 	or game:GetObjects("rbxassetid://77008296710097")[1]
-
+--[[
 if gethui then
 	VioletUI.Parent = gethui()
 elseif syn and syn.protect_gui then
@@ -101,6 +101,14 @@ elseif not IsStudio then
 			Interface:Destroy()
 		end
 	end
+end
+]]
+
+VioletUI.Parent = CoreGui
+for _,ui in ipairs(CoreGui:GetChildren()) do
+    if ui.Name == VioletUI.Name and ui ~= VioletUI then
+        ui:Destroy()
+    end
 end
 
 VioletUI.Enabled = true
