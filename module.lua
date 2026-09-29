@@ -550,7 +550,7 @@ function Violet:CreateWindow(WindowSettings)
 					local dOption = Dropdown.List.Template:Clone()
 					dOption.Name = option
 					dOption.Label.Text = option
-					dOption.LayoutOrder = #Dropdown.List:GetChildren() - 2
+					dOption.LayoutOrder = #Dropdown.List:GetChildren() - 1
 					dOption.Parent = Dropdown.List
 					dOption.Visible = true
  
