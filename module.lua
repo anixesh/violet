@@ -174,7 +174,6 @@ end
 local function ShowWindow()
 	Base.Visible = true
 
-	-- window pops open with a slight overshoot
 	tween(Base, { Size = UDim2.fromOffset(481, 310) }, ease.open)
 
 	task.delay(0.05, function()
@@ -468,7 +467,6 @@ function Violet:CreateWindow(WindowSettings)
 				tween(Button, { BackgroundTransparency = 0.5 }, ease.leave)
 			end)
 
-			-- quick squish feedback on click
 			Button.Interact["MouseButton1Down"]:Connect(function()
 				tween(Button, { BackgroundTransparency = 0.25 }, ease.press)
 			end)
@@ -492,25 +490,25 @@ function Violet:CreateWindow(WindowSettings)
 			local debounce = false
 			local Dropdown = Elements.Template.Dropdown:Clone()
 			Dropdown.Name = DropdownSettings.Title
-
+ 
 			Dropdown.BackgroundTransparency = 1
 			Dropdown.Top.BackgroundTransparency = 1
 			Dropdown.Top.Label.TextTransparency = 1
 			Dropdown.Top.SubLabel.TextTransparency = 1
 			Dropdown.Top.Icon.ImageTransparency = 1
-
+ 
 			Dropdown.Top.Label.Text = DropdownSettings.Title
 			Dropdown.Top.SubLabel.Text = ""
 			Dropdown.List.Visible = false
-
+ 
 			Dropdown.Parent = Data.Page
 			Dropdown.Visible = true
-
+ 
 			tween(Dropdown.Top, { BackgroundTransparency = 0.5 }, ease.hover)
 			tween(Dropdown.Top.Label, { TextTransparency = 0.3 }, ease.hover)
 			tween(Dropdown.Top.SubLabel, { TextTransparency = 0.5 }, ease.hover)
 			tween(Dropdown.Top.Icon, { ImageTransparency = 0.3 }, ease.hover)
-
+ 
 			if DropdownSettings.CurrentOption then
 				if type(DropdownSettings.CurrentOption) == "string" then
 					DropdownSettings.CurrentOption = { DropdownSettings.CurrentOption }
@@ -521,7 +519,7 @@ function Violet:CreateWindow(WindowSettings)
 			else
 				DropdownSettings.CurrentOption = {}
 			end
-
+ 
 			local function updateSubLabel()
 				local cur = DropdownSettings.CurrentOption
 				if DropdownSettings.MultipleOptions then
@@ -536,17 +534,17 @@ function Violet:CreateWindow(WindowSettings)
 					Dropdown.Top.SubLabel.Text = cur[1] or "None"
 				end
 			end
-
+ 
 			updateSubLabel()
-
+ 
 			local optionheight = 25
 			local padding = 6
 			local topheight = 35
-
+ 
 			local function calculateOpenHeight()
 				return topheight + math.min(#DropdownSettings.Options, 5) * (optionheight + padding)
 			end
-
+ 
 			local function SetOptions()
 				for _, option in ipairs(DropdownSettings.Options) do
 					local dOption = Dropdown.List.Template:Clone()
@@ -555,60 +553,91 @@ function Violet:CreateWindow(WindowSettings)
 					dOption.LayoutOrder = #Dropdown.List:GetChildren() - 3
 					dOption.Parent = Dropdown.List
 					dOption.Visible = true
-
+ 
 					tween(dOption.Label, { TextTransparency = 0.4 }, ease.hover)
-
+ 
 					dOption.Interact["MouseEnter"]:Connect(function()
 						if not table.find(DropdownSettings.CurrentOption, option) then
 							tween(dOption, { BackgroundTransparency = 0.75 }, ease.hover)
 							tween(dOption.Label, { TextTransparency = 0.25 }, ease.hover)
 						end
 					end)
-
+ 
 					dOption.Interact["MouseLeave"]:Connect(function()
 						if not table.find(DropdownSettings.CurrentOption, option) then
 							tween(dOption, { BackgroundTransparency = 1 }, ease.leave)
 							tween(dOption.Label, { TextTransparency = 0.4 }, ease.leave)
 						end
 					end)
-
+ 
+					local function deselectVisual(frame)
+						tween(frame, { BackgroundTransparency = 1 }, ease.leave)
+						tween(frame.Label, { TextTransparency = 0.4 }, ease.leave)
+						tween(frame.Icon, { ImageTransparency = 1 }, ease.leave)
+					end
+ 
+					local function selectVisual(frame)
+						tween(frame, { BackgroundTransparency = 0.3 }, ease.toggle)
+						tween(frame.Label, { TextTransparency = 0.2 }, ease.toggle)
+						tween(frame.Icon, { ImageTransparency = 0.2 }, ease.toggle)
+					end
+ 
 					dOption.Interact["MouseButton1Click"]:Connect(function()
-						local idx = table.find(DropdownSettings.CurrentOption, option)
-						if idx then
-							table.remove(DropdownSettings.CurrentOption, idx)
-							tween(dOption, { BackgroundTransparency = 1 }, ease.leave)
-							tween(dOption.Label, { TextTransparency = 0.4 }, ease.leave)
-							tween(dOption.Icon, { ImageTransparency = 1 }, ease.leave)
+						if DropdownSettings.MultipleOptions then
+							local idx = table.find(DropdownSettings.CurrentOption, option)
+							if idx then
+								table.remove(DropdownSettings.CurrentOption, idx)
+								deselectVisual(dOption)
+							else
+								table.insert(DropdownSettings.CurrentOption, option)
+								selectVisual(dOption)
+							end
 						else
-							table.insert(DropdownSettings.CurrentOption, option)
-							tween(dOption, { BackgroundTransparency = 0.3 }, ease.toggle)
-							tween(dOption.Label, { TextTransparency = 0.2 }, ease.toggle)
-							tween(dOption.Icon, { ImageTransparency = 0.2 }, ease.toggle)
+							local previous = DropdownSettings.CurrentOption[1]
+ 
+							if previous == option then
+								DropdownSettings.CurrentOption = {}
+								deselectVisual(dOption)
+							else
+								if previous then
+									local previousFrame = Dropdown.List:FindFirstChild(previous)
+									if previousFrame then
+										deselectVisual(previousFrame)
+									end
+								end
+ 
+								DropdownSettings.CurrentOption = { option }
+								selectVisual(dOption)
+							end
 						end
-
+ 
 						updateSubLabel()
-
+ 
 						local success, response = pcall(function()
-							DropdownSettings.Callback(DropdownSettings.CurrentOption)
+							if DropdownSettings.MultipleOptions then
+								DropdownSettings.Callback(DropdownSettings.CurrentOption)
+							else
+								DropdownSettings.Callback(DropdownSettings.CurrentOption[1])
+							end
 						end)
-
+ 
 						if not success then
 							warn("[Violet]: " .. tostring(response))
 						end
 					end)
 				end
 			end
-
+ 
 			SetOptions()
-
+ 
 			Dropdown.Top["MouseEnter"]:Connect(function()
 				tween(Dropdown.Top, { BackgroundTransparency = 0.38 }, ease.hover)
 			end)
-
+ 
 			Dropdown.Top["MouseLeave"]:Connect(function()
 				tween(Dropdown.Top, { BackgroundTransparency = 0.5 }, ease.leave)
 			end)
-
+ 
 			Dropdown.Top.Interact["MouseButton1Click"]:Connect(function()
 				if not debounce then
 					tween(Dropdown, { BackgroundTransparency = 0.75 }, ease.dropIn)
@@ -626,7 +655,7 @@ function Violet:CreateWindow(WindowSettings)
 					debounce = false
 				end
 			end)
-
+ 
 			return DropdownSettings
 		end
 
@@ -654,7 +683,6 @@ function Violet:CreateWindow(WindowSettings)
 
 			Input.Holder.Size = UDim2.new(0, Input.Holder.InputBox.TextBounds.X + 24, 0, 23)
 
-			-- brighter stroke while focused
 			Input.Holder.InputBox.Focused:Connect(function()
 				tween(Input.Holder.UIStroke, { Transparency = 0.3 }, ease.hover)
 			end)
@@ -691,7 +719,6 @@ function Violet:CreateWindow(WindowSettings)
 			return InputSettings
 		end
 
-		-- ── Slider ───────────────────────────────────────────────────────────
 		function Data:CreateSlider(SliderSettings)
 			local dragging = false
 			local Slider = Elements.Template.Slider:Clone()
@@ -807,7 +834,6 @@ function Violet:CreateWindow(WindowSettings)
 		return Data
 	end
 
-	-- ── Window buttons ────────────────────────────────────────────────────────
 	Base.Close["MouseButton1Click"]:Connect(function()
 		HideWindow()
 		Violet:Notify("Cosmic Hub", "Script unloaded, re-execute to load the script again.", 5)
