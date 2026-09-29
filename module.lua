@@ -505,7 +505,7 @@ function Violet:CreateWindow(WindowSettings)
 			Dropdown.Top.SubLabel.TextTransparency = 1
 			Dropdown.Top.Icon.ImageTransparency = 1
 
-            Dropdown.List.Size = UDim2.new(1,0,1,0)
+            Dropdown.List.Size = UDim2.new(1,0,1,-35)
  
 			Dropdown.Top.Label.Text = DropdownSettings.Title
 			Dropdown.Top.SubLabel.Text = ""
@@ -548,7 +548,7 @@ function Violet:CreateWindow(WindowSettings)
 			updateSubLabel()
  
 			local optionheight = 25
-			local padding = 6
+			local padding = 7
 			local topheight = 35
  
 			local function calculateOpenHeight()
