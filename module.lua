@@ -504,6 +504,8 @@ function Violet:CreateWindow(WindowSettings)
 			Dropdown.Top.Label.TextTransparency = 1
 			Dropdown.Top.SubLabel.TextTransparency = 1
 			Dropdown.Top.Icon.ImageTransparency = 1
+
+            Dropdown.List.Size = UDim2.new(1,0,1,0)
  
 			Dropdown.Top.Label.Text = DropdownSettings.Title
 			Dropdown.Top.SubLabel.Text = ""
